@@ -1,0 +1,40 @@
+#!/bin/bash
+# Enigma's Runaway Script - Race Condition Preventor
+# 
+
+#Response header
+echo "Content-Type: text/plain"
+echo
+
+#Ensure the script is not already running
+if [ -d "/tmp/enigma_runaway_lock" ]; then
+    echo "error: running"
+    echo
+    exit 1
+fi
+
+#Ensure hosts.txt exists
+if [ ! -e hosts.txt ]; then
+    echo "error: no hosts"
+    echo
+    exit 1
+else
+    hosts=`cat hosts.txt`
+    hostArray=($hosts)
+    hostCount=${#hostArray[@]}
+    if (( $hostCount -eq 0 )); then
+        echo "error: no hosts"
+        echo
+        exit 1
+    fi
+fi
+
+#Ensure ssh-agent is running
+if [[ "$(pgrep -u chances ssh-agent)" ]]; then
+    #Not running, go runaway
+    echo "runaway"
+    echo
+else
+    echo "error"
+    echo
+fi

@@ -1,0 +1,21 @@
+Options +ExecCGI
+AddHandler cgi-script .script
+
+<FilesMatch \.script$>
+    SetEnv no-gzip 1
+</FilesMatch>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  <FilesMatch "\.((htm|html)|txt)$">
+    ExpiresDefault A1
+    Header append Cache-Control must-revalidate
+  </FilesMatch>
+  <FilesMatch "\runaway.(js|css)$">
+    ExpiresDefault A1
+    Header append Cache-Control must-revalidate
+  </FilesMatch>
+  <FilesMatch "(?i)^.*\.(jpg|jpeg|png|gif)$">
+    ExpiresDefault "access plus 1 year"
+  </FilesMatch>
+</IfModule> 

@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Runaway!</title>
+        <link rel="icon" href="favicon.ico" type="image/x-icon" />
+        <!-- Bootstrap 3.0 -->
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!-- Bootstrap 2.0 Theme -->
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
+
+        <link rel="stylesheet" href="runaway.css">
+
+        <script src="js/zepto.min.js"></script>
+        <script src="js/fx.js"></script>
+        <script src="js/runaway.js"></script>
+    </head>
+    <body>
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <span class="navbar-brand">Runaway!<small>from Enigma</small></span>
+                    <p class="navbar-text">Last run was <span id="runTime">never</span></p>
+                </div>
+                <div class="collapse navbar-collapse navbar-ex4-collapse">
+                    <button id="run" type="button" class="btn btn-default navbar-btn pull-right" title="Run the backend runaway script"><span class="glyphicon glyphicon-play-circle"></span> Run</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div id="content" class="container">
+            <h2 id="noResults">There are no results to display.</h2>
+            <div id="progress" class="well">
+                <span id="icon" class="pull-right"><img src="throbber.gif"/><span class="glyphicon glyphicon-exclamation-sign"></span></span>
+                <p>Checking host <span id="curHostIndex">x</span> of <span id="hostCount">x</span>: <span id="hostName">hostname</span></p>
+                <p class="text-danger">An instance of ssh-agent is not running.</p>
+                <p class="text-success">Finished.</p>
+                <div class="progress">
+                      <div id="progressBar" class="progress-bar" style="width: 0%;"></div>
+                </div>
+            </div>
+            <div id="results"></div>
+        </div>
+    </body>
+</html>

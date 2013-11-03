@@ -1,0 +1,49 @@
+#!/bin/bash
+# Enigma's Runaway Script
+# 
+
+#Response header
+echo "Content-Type: application/octet-stream"
+echo
+
+#Hosts to check
+hosts=`cat hosts.txt`
+hostArray=($hosts)
+hostCount=${#hostArray[@]}
+
+date="`date '+%A, %B %d, %Y at %l:%M %p'`"
+
+#Make lock directory to prevent race condition
+mkdir /tmp/enigma_runaway_lock 2>/dev/null
+
+#Begin response
+echo "$hostCount|$date"
+
+echo "$date" > ~/public_html/runaway/results.txt
+echo >> ~/public_html/runaway/results.txt
+
+count=0
+
+#Stream progress
+for host in $hosts; do
+    #Increment counter
+    count=`expr $count + 1`
+
+    #Progess with host name
+    echo "$host"
+    
+    #Check host and output to results
+    hostIp="`host -t A $host | awk -F' ' '{print$4}'`"
+    echo "$host $hostIp" >> ~/public_html/runaway/results.txt
+
+    ssh -o ConnectTimeout=5 $hostIp\
+    ps -eo pid,comm,user,pcpu,pmem,time --sort=-cp | grep -v root | grep -v avahi | head -6 | grep -v "%CPU" >> ~/public_html/runaway/results.txt;
+
+    #Output delimiter
+    if [[ $count -ne $hostCount ]]; then
+        echo >> ~/public_html/runaway/results.txt
+    fi
+done
+
+#Remove lock directory
+rmdir /tmp/enigma_runaway_lock
