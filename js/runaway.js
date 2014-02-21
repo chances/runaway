@@ -180,10 +180,6 @@ function runScript() {
                 $('#progress .text-danger').text('There are no hosts to check.');
                 setProgressStatus('error');
                 keepGoing = false;
-            } else if (response === "error") {
-                $('#progress .text-danger').text('An instance of ssh-agent is not running.');
-                setProgressStatus('error');
-                keepGoing = false;
             }
         },
         dataType: 'text'});

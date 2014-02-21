@@ -29,12 +29,6 @@ else
     fi
 fi
 
-#Ensure ssh-agent is running
-if [[ "$(pgrep -u chances ssh-agent)" ]]; then
-    #Not running, go runaway
-    echo "runaway"
-    echo
-else
-    echo "error"
-    echo
-fi
+#Go runaway
+echo "runaway"
+echo
