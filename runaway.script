@@ -37,7 +37,7 @@ for host in $hosts; do
     echo "$host $hostIp" >> ~/public_html/runaway/results.txt
 
     ssh -o ConnectTimeout=5 $hostIp\
-    ps -eo pid,comm,user,pcpu,pmem,time --sort=-cp | grep -v root | grep -v avahi | head -6 | grep -v "%CPU" >> ~/public_html/runaway/results.txt;
+    ps -eo pid,comm,user,pcpu,pmem,time --sort=-cp | grep -v root | grep -v avahi | head -6 | tail -5 >> ~/public_html/runaway/results.txt;
 
     #Output delimiter
     if [[ $count -ne $hostCount ]]; then
