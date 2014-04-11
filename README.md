@@ -25,7 +25,7 @@ runaway check.
 Warning, there be bugs and hacks within. Use at your own risk. **Be
 forewarned, YMMV.**
 
-Farmiliarize yourself with the source. Some changes may need to be made
+Familiarize yourself with the source. Some changes may need to be made
 in order to get the script to work in your environment.
 
 ###SSH and Remote Hosts
