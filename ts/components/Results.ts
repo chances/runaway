@@ -16,7 +16,7 @@ module Runaway {
             this._runDate = '';
             this._isDirty = false;
 
-            this.hide(false);
+            this.hide();
         }
 
         public get lastRunDate() {
@@ -50,7 +50,7 @@ module Runaway {
             this.getResults().then((results: string) => {
                 this.parse(results);
                 this.isDirty = false;
-                delay(225).then(() => {
+                Helpers.delay(225).then(() => {
                     this.show(true);
                     promise(true, []);
                 });

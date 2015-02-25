@@ -65,7 +65,7 @@ module Runaway.Services {
 
         public update(): PinkySwear.Promise {
             var promise = pinkySwear(),
-                trackProgress: Interval,
+                trackProgress: Helpers.Interval,
                 doUpdateProgress = () => {
                     this.getProgress().then((progress) => {
                         if (progress === 1.0) {
@@ -79,7 +79,7 @@ module Runaway.Services {
                 };
 
             if (app.isRunawayCheckRunning && !app.initByUser) {
-                trackProgress = interval(function () {
+                trackProgress = Helpers.interval(function () {
                     doUpdateProgress();
                 }, 2000);
                 doUpdateProgress();

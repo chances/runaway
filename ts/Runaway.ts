@@ -21,20 +21,21 @@ module Runaway {
                             this._running = false;
                             this._progress.update();
                             this._results.hide(true);
-                            delay(250).then(() => {
+                            Helpers.delay(250).then(() => {
                                 this._results.update();
                             });
                         }, () => {
                             this._running = false;
                             this._progress.update();
                             this._results.hide(true);
-                            delay(250).then(() => {
+                            Helpers.delay(250).then(() => {
                                 this._results.update();
                             });
                         });
                         this._results.update();
                     } else if (status === RunStatus.NO_HOSTS) {
                         //TODO: Show no hosts error
+                        this._progress.errorText = 'There are no hosts to check.';
                         this._progress.setStatus(ProgressStatus.ERROR);
                     } else {
                         this._results.update();
@@ -79,7 +80,7 @@ module Runaway {
                             this._progress.setStatus(ProgressStatus.SUCCESS);
                             this._progress.update();
                             this._results.hide(true);
-                            delay(250).then(() => {
+                            Helpers.delay(250).then(() => {
                                 this._results.update();
                             });
                         });
@@ -122,7 +123,7 @@ module Runaway {
                     };
                     request.open("get", "runaway.script", true);
                     request.send();
-                    //delay(function () {
+                    //Helpers.delay(function () {
                     //    request.send();
                     //}, 200);
                 }
@@ -132,9 +133,9 @@ module Runaway {
         public checkCompleted() {
             this._progress.setStatus(ProgressStatus.SUCCESS);
             this._progress.currentHostIndex = this._progress.hostCount;
-            delay(700).then(() => {
+            Helpers.delay(700).then(() => {
                 this._results.hide(true, 300);
-                delay(500).then(() => {
+                Helpers.delay(500).then(() => {
                     this._progress.layout();
                     this._results.update().then(() => {
                         this._running = false;
@@ -166,33 +167,5 @@ module Runaway {
 
             return promise;
         }
-    }
-
-    export enum RunStatus {
-        NOT_RUNNING,
-        RUNNING,
-        NO_HOSTS
-    }
-
-    export function delay(time: number): PinkySwear.Promise {
-        var promise = pinkySwear();
-        window.setTimeout(function () {
-            promise(true);
-        }, time);
-        return promise;
-    }
-
-    export interface Interval {
-        intervalId: number;
-        clear: () => void;
-    }
-
-    //Interval utility function
-    export function interval(func: () => void, time: number): Interval {
-        var interval = window.setInterval(func, time);
-        return {
-            intervalId: interval,
-            clear: function () { window.clearInterval(interval); }
-        };
     }
 }

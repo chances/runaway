@@ -30,7 +30,7 @@ module Runaway {
             this._currentHostIndex = 0;
             this._currentHostName = '';
 
-            this.hide(false);
+            this.hide();
 
             this.layout();
             this.e.addClass('fixed');
@@ -116,7 +116,7 @@ module Runaway {
 
         public update(): PinkySwear.Promise {
             var promise = pinkySwear(),
-                trackProgress: Interval,
+                trackProgress: Helpers.Interval,
                 doUpdateProgress = () => {
                     this.getProgress().then((progress) => {
                         if (progress === 1.0) {
@@ -130,7 +130,7 @@ module Runaway {
             };
 
             if (app.isRunawayCheckRunning && !app.initByUser) {
-                trackProgress = interval(function () {
+                trackProgress = Helpers.interval(function () {
                     doUpdateProgress();
                 }, 2000);
                 doUpdateProgress();
@@ -140,7 +140,7 @@ module Runaway {
             } else if (app.isRunawayCheckRunning) {
                 this._runButton.hide();
                 this._runningLabel.show();
-                delay(250).then(() => {
+                Helpers.delay(250).then(() => {
                     this.show(true, $.fx.speeds.fast);
                 });
                 promise(true, []);
@@ -198,11 +198,5 @@ module Runaway {
 
             return promise;
         }
-    }
-
-    export enum ProgressStatus {
-        RUNNING,
-        SUCCESS,
-        ERROR
     }
 }
