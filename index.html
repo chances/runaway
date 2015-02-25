@@ -10,9 +10,10 @@
 
         <link rel="stylesheet" href="runaway.css">
 
-        <script src="js/zepto.min.js"></script>
-        <script src="js/fx.js"></script>
-        <script src="js/runaway.js"></script>
+        <script src="js/lib/zepto.min.js"></script>
+        <script src="js/lib/fx.js"></script>
+        <script src="js/lib/pinkyswear.min.js"></script>
+        <script src="js/runaway.ts.js"></script>
     </head>
     <body>
         <div class="navbar navbar-default navbar-fixed-top">
@@ -22,6 +23,7 @@
                     <p class="navbar-text">Last run was <span id="runTime">never</span></p>
                 </div>
                 <div class="collapse navbar-collapse navbar-ex4-collapse">
+                    <span id="running" class="navbar-text pull-right" title="Runaway! is currently performing a runaway check."><span class="glyphicon glyphicon-refresh"></span> Running... <span id="runningPercent"></span></span>
                     <button id="run" type="button" class="btn btn-default navbar-btn pull-right" title="Run the backend runaway script"><span class="glyphicon glyphicon-play-circle"></span> Run</button>
                 </div>
                 </div>
@@ -30,9 +32,9 @@
         <div id="content" class="container">
             <h2 id="noResults">There are no results to display.</h2>
             <div id="progress" class="well">
-                <span id="icon" class="pull-right"><img src="throbber.gif"/><span class="glyphicon glyphicon-exclamation-sign"></span></span>
+                <span id="icon" class="pull-right"><span class="glyphicon glyphicon-exclamation-sign"></span></span>
                 <p>Checking host <span id="curHostIndex">x</span> of <span id="hostCount">x</span>: <span id="hostName">hostname</span></p>
-                <p class="text-danger">An instance of ssh-agent is not running.</p>
+                <p class="text-danger">Error text.</p>
                 <p class="text-success">Finished.</p>
                 <div class="progress">
                       <div id="progressBar" class="progress-bar" style="width: 0%;"></div>

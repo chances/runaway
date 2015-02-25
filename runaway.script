@@ -1,6 +1,6 @@
 #!/bin/bash
 # Enigma's Runaway Script
-# 
+#
 
 #Response header
 echo "Content-Type: application/octet-stream"
@@ -31,12 +31,15 @@ for host in $hosts; do
 
     #Progess with host name
     echo "$host"
+
+    #Write progress to generic progress file
+    echo "$count/$hostCount $host" > ~/public_html/runaway/progress.txt
     
     #Check host and output to results
     hostIp="`host -t A $host | awk -F' ' '{print$4}'`"
     echo "$host $hostIp" >> ~/public_html/runaway/results.txt
 
-    ssh -o ConnectTimeout=5 $hostIp\
+    ssh -i /u/chances/.ssh/id_rsa_webz -o ConnectTimeout=5 $hostIp\
     ps -eo pid,comm,user,pcpu,pmem,time --sort=-cp | grep -v root | grep -v avahi | head -6 | tail -5 >> ~/public_html/runaway/results.txt;
 
     #Output delimiter
@@ -47,3 +50,5 @@ done
 
 #Remove lock directory
 rmdir /tmp/enigma_runaway_lock
+
+echo "$hostCount done" > ~/public_html/runaway/progress.txt

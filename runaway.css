@@ -2,6 +2,24 @@ body {
     background: rgba(200,200,200,0.2);
 }
 
+.glyphicon.glyphicon-refresh {
+    animation: throbberRotate linear 1s;
+    animation-iteration-count: infinite;
+    transform-origin: 50% 50%;
+    -webkit-animation: throbberRotate linear 1s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-transform-origin: 50% 50%;
+    -moz-animation: throbberRotate linear 1s;
+    -moz-animation-iteration-count: infinite;
+    -moz-transform-origin: 50% 50%;
+    -o-animation: throbberRotate linear 1s;
+    -o-animation-iteration-count: infinite;
+    -o-transform-origin: 50% 50%;
+    -ms-animation: throbberRotate linear 1s;
+    -ms-animation-iteration-count: infinite;
+    -ms-transform-origin: 50% 50%;
+}
+
 .navbar-default .navbar-brand, .navbar-default .navbar-brand:hover {
     color: #555 !important;
     position: relative;
@@ -23,6 +41,18 @@ body {
     text-align: right;
     display: block;
 
+}
+
+#running {
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+#running .glyphicon {
+    color: black;
+    top: 2px;
 }
 
 body > .container {
@@ -62,10 +92,6 @@ body > .container {
 #progress .progress {
     clear: both;
 }
-#icon img[src='throbber.gif'] {
-    width: 16px;
-    height: 16px;
-}
 .glyphicon-ok-circle {
     color: green;
 }
@@ -94,7 +120,15 @@ h3 {
     -ms-transition: opacity 0.4s ease;
 }
 #results.dirty {
-    opacity: 0.55;;
+    opacity: 0.55;
+}
+
+.alert {
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .well {
@@ -135,4 +169,50 @@ h3 {
 
 #crack {
     display: none;
+}
+
+
+@keyframes throbberRotate{
+    0% {
+        transform:  rotate(0deg) ;
+    }
+    100% {
+        transform:  rotate(360deg) ;
+    }
+}
+
+@-moz-keyframes throbberRotate{
+    0% {
+        -moz-transform:  rotate(0deg) ;
+    }
+    100% {
+        -moz-transform:  rotate(360deg) ;
+    }
+}
+
+@-webkit-keyframes throbberRotate {
+    0% {
+        -webkit-transform:  rotate(0deg) ;
+    }
+    100% {
+        -webkit-transform:  rotate(360deg) ;
+    }
+}
+
+@-o-keyframes throbberRotate {
+    0% {
+        -o-transform:  rotate(0deg) ;
+    }
+    100% {
+        -o-transform:  rotate(360deg) ;
+    }
+}
+
+@-ms-keyframes throbberRotate {
+    0% {
+        -ms-transform:  rotate(0deg) ;
+    }
+    100% {
+        -ms-transform:  rotate(360deg) ;
+    }
 }
