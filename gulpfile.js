@@ -3,17 +3,25 @@
  */
 
 var gulp = require('gulp');
+var gutil = require('gulp-util');
 var del = require('del');
 var path = require('path');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
 var runSequence = require('run-sequence');
+var rename = require('gulp-rename');
 var sourcemaps = require('gulp-sourcemaps');
 var ts = require('gulp-typescript');
-var concat = require('gulp-concat');
+var browserify = require('browserify');
 
-var source = 'ts/**/*.ts';
+var tsSource = ['ts/**/*.ts'];
+var builtSource = ['js/**/*.js', '!js/lib/*.js'];
+var builtDistSource = ['js/runaway.built.js'];
+var distSource = ['js/runaway.js'];
 
 var tsProject = ts.createProject({
     target: 'es5',
+    module: 'commonjs',
     sourceMap: true,
     removeComments : false,
     noImplicitAny: true,
@@ -22,7 +30,7 @@ var tsProject = ts.createProject({
 });
 
 gulp.task('clean', function (callback) {
-    del(['js/**/*.js', '!js/lib/*.js'], function (error) {
+    del(builtSource, function (error) {
         if (error) {
             return callback(error);
         }
@@ -31,13 +39,13 @@ gulp.task('clean', function (callback) {
 });
 
 gulp.task('typescript', function () {
-    var tsResult = gulp.src(source, { base: path.join(__dirname, 'ts/') })
+    var tsResult = gulp.src(tsSource, { base: path.join(__dirname, 'ts/') })
         .pipe(sourcemaps.init())
         .pipe(ts(tsProject, undefined, ts.reporter.fullReporter()));
 
-    tsResult.js
-        .pipe(concat('runaway.ts.js'))
-        .pipe(sourcemaps.write('../js'))
+    return tsResult.js
+        //.pipe(concat('runaway.ts.js'))
+        .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('js/'));
 });
 
@@ -49,9 +57,59 @@ gulp.task('watch', ['typescript'], function () {
     });
 });
 
-gulp.task('build', function(callback) {
-    runSequence('clean', 'ts', callback);
+gulp.task('bundle', function () {
+    var b = browserify({
+        entries: ['./js/main.js'],
+        debug: true
+    });
+
+    return b.bundle()
+        .pipe(source('main.js'))
+        .pipe(buffer())
+        .pipe(sourcemaps.init({loadMaps: true}))
+        .on('error', gutil.log)
+        .pipe(rename('runaway.built.js'))
+        .pipe(sourcemaps.write('./'))
+        .pipe(gulp.dest('js/'));
+});
+
+gulp.task('build-typescript', function(callback) {
+    runSequence('clean', 'typescript', callback);
+});
+
+gulp.task('build-bundle', ['build-typescript'], function(callback) {
+    runSequence('bundle', function () {
+        var deleteGlobs = builtSource;
+        deleteGlobs.push('js/**/*.map');
+        deleteGlobs.push('js/*/**/', '!js/lib');
+        deleteGlobs.push('!' + builtDistSource, '!' + builtDistSource + '.map');
+
+        del(deleteGlobs, function (error) {
+            if (error) {
+                return callback(error);
+            }
+
+            gulp.src(builtDistSource)
+                .pipe(sourcemaps.init({loadMaps: true}))
+                .pipe(rename(path.basename(distSource)))
+                .pipe(sourcemaps.write('./'))
+                .pipe(gulp.dest('js/'))
+                .on('finish', function () {
+                    var deleteGlobs = builtDistSource;
+                    deleteGlobs.push(builtDistSource + '.map');
+
+                    del(deleteGlobs, function (error) {
+                        if (error) {
+                            return callback(error);
+                        }
+
+                        callback();
+                    });
+                });
+        });
+    });
 });
 
 gulp.task('ts', ['typescript']);
+gulp.task('build', ['build-bundle']);
 gulp.task('default', ['watch']);

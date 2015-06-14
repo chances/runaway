@@ -13,7 +13,7 @@
         <script src="js/lib/zepto.min.js"></script>
         <script src="js/lib/fx.js"></script>
         <script src="js/lib/pinkyswear.min.js"></script>
-        <script src="js/runaway.ts.js"></script>
+        <script src="js/runaway.js"></script>
     </head>
     <body>
         <div class="navbar navbar-default navbar-fixed-top">
@@ -26,7 +26,6 @@
                     <span id="running" class="navbar-text pull-right" title="Runaway! is currently performing a runaway check."><span class="glyphicon glyphicon-refresh"></span> Running... <span id="runningPercent"></span></span>
                     <button id="run" type="button" class="btn btn-default navbar-btn pull-right" title="Run the backend runaway script"><span class="glyphicon glyphicon-play-circle"></span> Run</button>
                 </div>
-                </div>
             </div>
         </div>
         <div id="content" class="container">
@@ -37,7 +36,7 @@
                 <p class="text-danger">Error text.</p>
                 <p class="text-success">Finished.</p>
                 <div class="progress">
-                      <div id="progressBar" class="progress-bar" style="width: 0%;"></div>
+                      <div id="progressBar" class="progress-bar" style="width: 0;"></div>
                 </div>
             </div>
             <div id="results"></div>
