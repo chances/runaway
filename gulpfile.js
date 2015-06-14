@@ -13,6 +13,7 @@ var rename = require('gulp-rename');
 var sourcemaps = require('gulp-sourcemaps');
 var ts = require('gulp-typescript');
 var browserify = require('browserify');
+var watchify = require('watchify');
 
 var tsSource = ['ts/**/*.ts'];
 var builtSource = ['js/**/*.js', '!js/lib/*.js'];
@@ -29,6 +30,13 @@ var tsProject = ts.createProject({
     noExternalResolve: true
 });
 
+var b = browserify({
+    cache: {}, packageCache: {},
+    entries: ['./js/main.js'],
+    debug: true
+});
+watchify(b);
+
 gulp.task('clean', function (callback) {
     del(builtSource, function (error) {
         if (error) {
@@ -44,31 +52,31 @@ gulp.task('typescript', function () {
         .pipe(ts(tsProject, undefined, ts.reporter.fullReporter()));
 
     return tsResult.js
-        //.pipe(concat('runaway.ts.js'))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('js/'));
 });
 
-gulp.task('watch', ['typescript'], function () {
-    var watcher = gulp.watch(source, ['typescript']);
+gulp.task('watch', function () {
+    var watcher = gulp.watch(tsSource, function () {
+        runSequence('typescript', function () {
+            runSequence('bundle', function () {
+                finishBundling();
+            });
+        });
+    });
     watcher.on('change', function (event) {
         var filename = path.basename(event.path);
-        console.log(filename + ' was ' + event.type + ', compiling project...');
+        console.log(filename + ' was ' + event.type + ', compiling...');
     });
 });
 
 gulp.task('bundle', function () {
-    var b = browserify({
-        entries: ['./js/main.js'],
-        debug: true
-    });
-
     return b.bundle()
         .pipe(source('main.js'))
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
         .on('error', gutil.log)
-        .pipe(rename('runaway.built.js'))
+        .pipe(rename(path.basename(builtDistSource[0])))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('js/'));
 });
@@ -79,36 +87,43 @@ gulp.task('build-typescript', function(callback) {
 
 gulp.task('build-bundle', ['build-typescript'], function(callback) {
     runSequence('bundle', function () {
-        var deleteGlobs = builtSource;
-        deleteGlobs.push('js/**/*.map');
-        deleteGlobs.push('js/*/**/', '!js/lib');
-        deleteGlobs.push('!' + builtDistSource, '!' + builtDistSource + '.map');
-
-        del(deleteGlobs, function (error) {
-            if (error) {
-                return callback(error);
-            }
-
-            gulp.src(builtDistSource)
-                .pipe(sourcemaps.init({loadMaps: true}))
-                .pipe(rename(path.basename(distSource)))
-                .pipe(sourcemaps.write('./'))
-                .pipe(gulp.dest('js/'))
-                .on('finish', function () {
-                    var deleteGlobs = builtDistSource;
-                    deleteGlobs.push(builtDistSource + '.map');
-
-                    del(deleteGlobs, function (error) {
-                        if (error) {
-                            return callback(error);
-                        }
-
-                        callback();
-                    });
-                });
-        });
+        w.close();
+        finishBundling(callback);
     });
 });
+
+function finishBundling(callback) {
+    var deleteGlobs = builtSource;
+    deleteGlobs.push('js/**/*.map');
+    deleteGlobs.push('js/*/**/', '!js/lib');
+    deleteGlobs.push('!' + builtDistSource, '!' + builtDistSource + '.map');
+
+    del(deleteGlobs, function (error) {
+        if (error) {
+            return callback(error);
+        }
+
+        gulp.src(builtDistSource)
+            .pipe(sourcemaps.init({loadMaps: true}))
+            .pipe(rename(path.basename(distSource)))
+            .pipe(sourcemaps.write('./'))
+            .pipe(gulp.dest('js/'))
+            .on('finish', function () {
+                var deleteGlobs = builtDistSource;
+                deleteGlobs.push(builtDistSource + '.map');
+
+                del(deleteGlobs, function (error) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    if (callback !== undefined) {
+                        callback();
+                    }
+                });
+            });
+    });
+}
 
 gulp.task('ts', ['typescript']);
 gulp.task('build', ['build-bundle']);
