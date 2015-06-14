@@ -19,3 +19,10 @@ AddHandler cgi-script .script
     ExpiresDefault "access plus 1 year"
   </FilesMatch>
 </IfModule> 
+
+#Authenticated access only
+AuthName "Restricted Area - Run Away"
+AuthType Basic 
+AuthUserFile /u/chances/.htpasswd 
+AuthGroupFile /dev/null 
+require valid-user
