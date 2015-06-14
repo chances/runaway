@@ -1,32 +1,45 @@
 /// <reference path="../Application.ts" />
 import Helpers = require('../Helpers');
-import Bridge = require('../Bridge');
+import Events = require('../Bridge');
 
 class Progress {
-    private _app: Application;
-    private events: Bridge;
+    private events: Events.Bridge;
+
+    private _running: boolean;
+    private _initByUser: boolean;
     private _progress: number;
     private _hostCount: number;
     private _currentHostIndex: number;
     private _currentHostName: string;
 
     constructor() {
-        this._app = null;
-        this.events = new Bridge();
+        this.events = new Events.Bridge();
         this._progress = 0.0;
         this._hostCount = 0;
         this._currentHostIndex = 0;
         this._currentHostName = "";
     }
 
-    set app(value: Application) {
-        this._app = value;
+    public get isRunawayCheckRunning() {
+        return this._running;
+    }
+    public set isRunawayCheckRunning(value: boolean) {
+        this._running = value;
+        this.events.trigger("propertyChanged", {property: "isRunawayCheckRunning"});
     }
 
-    get progress(): number {
+    public get initByUser() {
+        return this._initByUser;
+    }
+    public set initByUser(value: boolean) {
+        this._initByUser = value;
+        this.events.trigger("propertyChanged", {property: "initByUser"});
+    }
+
+    public get progress(): number {
         return this._progress;
     }
-    set progress(value: number) {
+    public set progress(value: number) {
         this._progress = value;
         this.events.trigger("propertyChanged", {property: "progress"});
     }
@@ -55,16 +68,20 @@ class Progress {
         this.events.trigger("propertyChanged", {property: "currentHostName"});
     }
 
-    addEventListener(event: string, callback: BridgeCallback) {
+    addEventListener(event: string, callback: Events.BridgeCallback) {
         this.events.on(event, callback);
     }
 
     public reset() {
+        this._running = false;
+        this._initByUser = false;
         this._progress = 0.0;
         this._hostCount = 0;
         this._currentHostIndex = 0;
         this._currentHostName = '';
 
+        this.events.trigger("propertyChanged", {property: "isRunawayCheckRunning"});
+        this.events.trigger("propertyChanged", {property: "initByUser"});
         this.events.trigger("propertyChanged", {property: "progress"});
         this.events.trigger("propertyChanged", {property: "hostCount"});
         this.events.trigger("propertyChanged", {property: "currentHostIndex"});
@@ -86,7 +103,7 @@ class Progress {
                 });
             };
 
-        if (this._app.isRunawayCheckRunning && !this._app.initByUser) {
+        if (this.isRunawayCheckRunning && !this.initByUser) {
             trackProgress = Helpers.interval(function () {
                 doUpdateProgress();
             }, 2000);

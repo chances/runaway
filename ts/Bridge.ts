@@ -1,6 +1,6 @@
 import Helpers = require('./Helpers');
 
-class Bridge {
+export class Bridge {
 
     private handlers: BridgeHandler[];
 
@@ -63,4 +63,12 @@ class Bridge {
     }
 }
 
-export = Bridge;
+declare class BridgeHandler {
+    event: string;
+    id: number;
+    callback: BridgeCallback;
+}
+
+export interface BridgeCallback {
+    (data: any): void;
+}
