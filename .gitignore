@@ -1,5 +1,8 @@
 /node_modules/
 
+/.idea/tasks.xml
+/.idea/workspace.xml
+
 .brackets.json
 getHostsCmd.txt
 hosts.txt
