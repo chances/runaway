@@ -142,7 +142,7 @@ module Runaway {
                         if (warningRed)
                             glyph.toggleClass('glyphicon-warning-sign glyphicon-exclamation-sign');
                         header.append(glyph);
-                    }
+                    } //TODO: Show the green all good check mark, otherwise?
 
                     table.append(thead);
                     table.append(tbody);

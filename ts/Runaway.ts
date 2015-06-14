@@ -34,7 +34,7 @@ module Runaway {
                         });
                         this._results.update();
                     } else if (status === RunStatus.NO_HOSTS) {
-                        //TODO: Show no hosts error
+                        //FIXME: Show no hosts error
                         this._progress.errorText = 'There are no hosts to check.';
                         this._progress.setStatus(ProgressStatus.ERROR);
                     } else {
