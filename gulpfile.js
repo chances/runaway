@@ -5,6 +5,7 @@
 var gulp = require('gulp');
 var del = require('del');
 var path = require('path');
+var runSequence = require('run-sequence');
 var sourcemaps = require('gulp-sourcemaps');
 var ts = require('gulp-typescript');
 var concat = require('gulp-concat');
@@ -30,13 +31,13 @@ gulp.task('clean', function (callback) {
 });
 
 gulp.task('typescript', function () {
-    var tsResult = gulp.src(source)
+    var tsResult = gulp.src(source, { base: path.join(__dirname, 'ts/') })
         .pipe(sourcemaps.init())
         .pipe(ts(tsProject, undefined, ts.reporter.fullReporter()));
 
     tsResult.js
         .pipe(concat('runaway.ts.js'))
-        .pipe(sourcemaps.write())
+        .pipe(sourcemaps.write('../js'))
         .pipe(gulp.dest('js/'));
 });
 
@@ -48,6 +49,9 @@ gulp.task('watch', ['typescript'], function () {
     });
 });
 
+gulp.task('build', function(callback) {
+    runSequence('clean', 'ts', callback);
+});
+
 gulp.task('ts', ['typescript']);
-gulp.task('build', ['clean', 'typescript']);
 gulp.task('default', ['watch']);
