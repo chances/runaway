@@ -31,7 +31,7 @@ var b = browserify({
     entries: ['./js/main.js'],
     debug: true
 });
-watchify(b);
+var bw = watchify(b);
 
 gulp.task('clean', function (callback) {
     del(builtSource, function (error) {
@@ -83,7 +83,7 @@ gulp.task('build-typescript', function(callback) {
 
 gulp.task('build-bundle', ['build-typescript'], function(callback) {
     runSequence('bundle', function () {
-        w.close();
+        bw.close();
         finishBundling(callback);
     });
 });
