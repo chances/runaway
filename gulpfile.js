@@ -1,7 +1,3 @@
-/**
- * Created by Chance Snow on 12/7/14.
- */
-
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var del = require('del');
