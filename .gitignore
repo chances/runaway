@@ -1,7 +1,10 @@
-/node_modules/
-
 /.idea/tasks.xml
 /.idea/workspace.xml
+
+/node_modules/
+
+js/**/*
+!js/lib
 
 .brackets.json
 getHostsCmd.txt
