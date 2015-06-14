@@ -13,7 +13,7 @@ var source = 'ts/**/*.ts';
 
 var tsProject = ts.createProject({
     target: 'es5',
-    sourceMap: false,
+    sourceMap: true,
     removeComments : false,
     noImplicitAny: true,
     declarationFiles: false,
