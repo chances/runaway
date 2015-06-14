@@ -1,6 +1,10 @@
+import Progress = require('./services/Progress');
+import Application = require('./Application');
 
 var services = {
-    progress: new Runaway.Services.Progress()
+    progress: new Progress()
 };
 
-var app = new Runaway.Application();
+var app = new Application();
+
+services.progress.app = app;

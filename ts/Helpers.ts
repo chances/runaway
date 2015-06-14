@@ -1,4 +1,4 @@
-module Runaway.Helpers {
+module Helpers {
 
     export function delay(time: number): PinkySwear.Promise {
         var promise = pinkySwear();
@@ -34,3 +34,5 @@ module Runaway.Helpers {
         }
     }
 }
+
+export = Helpers;

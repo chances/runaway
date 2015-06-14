@@ -1,121 +1,130 @@
-module Runaway.Services {
+/// <reference path="../Application.ts" />
+import Helpers = require('../Helpers');
+import Bridge = require('../Bridge');
 
-    export class Progress {
-        private events: Bridge;
-        private _progress: number;
-        private _hostCount: number;
-        private _currentHostIndex: number;
-        private _currentHostName: string;
+class Progress {
+    private _app: Application;
+    private events: Bridge;
+    private _progress: number;
+    private _hostCount: number;
+    private _currentHostIndex: number;
+    private _currentHostName: string;
 
-        constructor() {
-            this.events = new Bridge();
-            this._progress = 0.0;
-            this._hostCount = 0;
-            this._currentHostIndex = 0;
-            this._currentHostName = "";
-        }
+    constructor() {
+        this._app = null;
+        this.events = new Bridge();
+        this._progress = 0.0;
+        this._hostCount = 0;
+        this._currentHostIndex = 0;
+        this._currentHostName = "";
+    }
 
-        get progress(): number {
-            return this._progress;
-        }
-        set progress(value: number) {
-            this._progress = value;
-            this.events.trigger("propertyChanged", {property: "progress"});
-        }
+    set app(value: Application) {
+        this._app = value;
+    }
 
-        public get hostCount(): number {
-            return this._hostCount;
-        }
-        public set hostCount(value: number) {
-            this._hostCount = value;
-            this.events.trigger("propertyChanged", {property: "hostCount"});
-        }
+    get progress(): number {
+        return this._progress;
+    }
+    set progress(value: number) {
+        this._progress = value;
+        this.events.trigger("propertyChanged", {property: "progress"});
+    }
 
-        public get currentHostIndex(): number {
-            return this._currentHostIndex;
-        }
-        public set currentHostIndex(value: number) {
-            this._currentHostIndex = value;
-            this.events.trigger("propertyChanged", {property: "currentHostIndex"});
-        }
+    public get hostCount(): number {
+        return this._hostCount;
+    }
+    public set hostCount(value: number) {
+        this._hostCount = value;
+        this.events.trigger("propertyChanged", {property: "hostCount"});
+    }
 
-        public get currentHostName(): string {
-            return this._currentHostName;
-        }
-        public set currentHostName(value: string) {
-            this._currentHostName = value;
-            this.events.trigger("propertyChanged", {property: "currentHostName"});
-        }
+    public get currentHostIndex(): number {
+        return this._currentHostIndex;
+    }
+    public set currentHostIndex(value: number) {
+        this._currentHostIndex = value;
+        this.events.trigger("propertyChanged", {property: "currentHostIndex"});
+    }
 
-        addEventListener(event: string, callback: BridgeCallback) {
-            this.events.on(event, callback);
-        }
+    public get currentHostName(): string {
+        return this._currentHostName;
+    }
+    public set currentHostName(value: string) {
+        this._currentHostName = value;
+        this.events.trigger("propertyChanged", {property: "currentHostName"});
+    }
 
-        public reset() {
-            this._progress = 0.0;
-            this._hostCount = 0;
-            this._currentHostIndex = 0;
-            this._currentHostName = '';
+    addEventListener(event: string, callback: BridgeCallback) {
+        this.events.on(event, callback);
+    }
 
-            this.events.trigger("propertyChanged", {property: "progress"});
-            this.events.trigger("propertyChanged", {property: "hostCount"});
-            this.events.trigger("propertyChanged", {property: "currentHostIndex"});
-            this.events.trigger("propertyChanged", {property: "currentHostName"});
-        }
+    public reset() {
+        this._progress = 0.0;
+        this._hostCount = 0;
+        this._currentHostIndex = 0;
+        this._currentHostName = '';
 
-        public update(): PinkySwear.Promise {
-            var promise = pinkySwear(),
-                trackProgress: Helpers.Interval,
-                doUpdateProgress = () => {
-                    this.getProgress().then((progress) => {
-                        if (progress === 1.0) {
-                            trackProgress.clear();
-                            promise(true, []);
-                        }
-                    }, function () {
+        this.events.trigger("propertyChanged", {property: "progress"});
+        this.events.trigger("propertyChanged", {property: "hostCount"});
+        this.events.trigger("propertyChanged", {property: "currentHostIndex"});
+        this.events.trigger("propertyChanged", {property: "currentHostName"});
+    }
+
+    public update(): PinkySwear.Promise {
+        var promise = pinkySwear(),
+            trackProgress: Helpers.Interval,
+            doUpdateProgress = () => {
+                this.getProgress().then((progress) => {
+                    if (progress === 1.0) {
                         trackProgress.clear();
-                        promise(false, []);
-                    });
-                };
-
-            if (app.isRunawayCheckRunning && !app.initByUser) {
-                trackProgress = Helpers.interval(function () {
-                    doUpdateProgress();
-                }, 2000);
-                doUpdateProgress();
-            }
-
-            return promise;
-        }
-
-        private getProgress(): PinkySwear.GenericPromise<number> {
-            var promise = pinkySwear<number>();
-
-            $.ajax({
-                url: 'progress.txt',
-                success: (response) => {
-                    response = response.split('\n')[0].split(' ');
-                    if (response[1] === "done") {
-                        this.hostCount = parseInt(response[0]);
-                        this.currentHostIndex = this.hostCount;
-
-                        promise(true, [1.0]);
-                    } else {
-                        this.currentHostName = response[1];
-                        response = response[0].split('/');
-                        this._hostCount = parseInt(response[1]);
-                        this.currentHostIndex = parseInt(response[0]);
-
-                        promise(true, [this.progress]);
+                        promise(true, []);
                     }
-                },
-                error: function() {
-                    promise(false, [0.0]);
-                },
-                dataType: 'text'
-            });
+                }, function () {
+                    trackProgress.clear();
+                    promise(false, []);
+                });
+            };
 
-            return promise;
+        if (this._app.isRunawayCheckRunning && !this._app.initByUser) {
+            trackProgress = Helpers.interval(function () {
+                doUpdateProgress();
+            }, 2000);
+            doUpdateProgress();
         }
+
+        return promise;
+    }
+
+    private getProgress(): PinkySwear.GenericPromise<number> {
+        var promise = pinkySwear<number>();
+
+        $.ajax({
+            url: 'progress.txt',
+            success: (response) => {
+                response = response.split('\n')[0].split(' ');
+                if (response[1] === "done") {
+                    this.hostCount = parseInt(response[0]);
+                    this.currentHostIndex = this.hostCount;
+
+                    promise(true, [1.0]);
+                } else {
+                    this.currentHostName = response[1];
+                    response = response[0].split('/');
+                    this._hostCount = parseInt(response[1]);
+                    this.currentHostIndex = parseInt(response[0]);
+
+                    promise(true, [this.progress]);
+                }
+            },
+            error: function() {
+                promise(false, [0.0]);
+            },
+            dataType: 'text'
+        });
+
+        return promise;
     }
 }
+
+export = Progress;

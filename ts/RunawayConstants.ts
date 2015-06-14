@@ -1,4 +1,4 @@
-module Runaway {
+module Constants {
 
     export enum RunStatus {
         NOT_RUNNING,
@@ -12,3 +12,5 @@ module Runaway {
         ERROR
     }
 }
+
+export = Constants;
