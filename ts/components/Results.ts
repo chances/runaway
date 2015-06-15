@@ -57,7 +57,6 @@ class Results extends Component {
             this.parse(results);
             this.isDirty = false;
             Helpers.delay(225).then(() => {
-                console.log('delay to show results...');
                 this.show(true);
                 promise(true, []);
             });

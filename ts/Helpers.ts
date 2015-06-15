@@ -2,7 +2,6 @@ module Helpers {
 
     export function delay(time: number): PinkySwear.Promise {
         var promise = pinkySwear();
-        console.log('Setting timeout for ' + time + 'ms');
         window.setTimeout(function () {
             promise(true);
         }, time);
