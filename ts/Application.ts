@@ -19,29 +19,23 @@ class Application {
             this._progress = new ProgressComponent(this, this._progressService);
             this._results = new Results(this._progressService);
 
+            this._progress.reset();
+
             this.getRunStatus().then((status: Constants.RunStatus) => {
                 if (status === Constants.RunStatus.RUNNING) {
-                    this._progressService.isRunawayCheckRunning = true;
-                    this._progressService.initByUser = false;
-                    this._progress.reset();
-                    this._progress.update().then(() => {
-                        this._progressService.isRunawayCheckRunning = false;
-                        this._progress.update();
-                        this._results.hide(true);
-                        Helpers.delay(250).then(() => {
-                            this._results.update();
+                    this._progress.setStatus(Constants.ProgressStatus.RUNNING);
+                    this._progressService.update().then(() => {
+                        this._results.reload().then(() => {
+                            this._progress.setStatus(Constants.ProgressStatus.SUCCESS);
                         });
                     }, () => {
                         this._progressService.isRunawayCheckRunning = false;
-                        this._progress.update();
-                        this._results.hide(true);
-                        Helpers.delay(250).then(() => {
-                            this._results.update();
-                        });
+                        this._results.reload();
                     });
-                    this._results.update();
+                    this._results.update().then(() => {
+                        this._results.isDirty = true;
+                    });
                 } else if (status === Constants.RunStatus.NO_HOSTS) {
-                    //FIXME: Show no hosts error
                     this._progress.errorText = 'There are no hosts to check.';
                     this._progress.setStatus(Constants.ProgressStatus.ERROR);
                 } else {
@@ -49,9 +43,6 @@ class Application {
                 }
             });
         });
-
-        this._progressService.isRunawayCheckRunning = false;
-        this._progressService.initByUser = false;
     }
 
     public get progress() {
@@ -63,7 +54,7 @@ class Application {
     }
 
     public run() {
-        this._progressService.isRunawayCheckRunning = true;
+        this._progressService.reset();
         this._progressService.initByUser = true;
         this._progress.reset();
         this._results.isDirty = true;
@@ -72,27 +63,22 @@ class Application {
             if (status === Constants.RunStatus.RUNNING) {
                 this._progress.errorText = 'Runaway! is currently performing a runaway check.';
                 this._progress.setStatus(Constants.ProgressStatus.ERROR);
-                this._progress.update().then(() => {
-                    this._progressService.initByUser = false;
-                    this._progress.update().then(() => {
-                        this._progressService.isRunawayCheckRunning = false;
-                        this._progress.setStatus(Constants.ProgressStatus.SUCCESS);
-                        this._progress.update();
-                        this._results.hide(true);
-                        Helpers.delay(250).then(() => {
-                            this._results.update();
-                        });
-                    });
+                this._progressService.isRunawayCheckRunning = true;
+                this._progressService.initByUser = false;
+                this._progressService.update().then(() => {
+                    this._progress.setStatus(Constants.ProgressStatus.SUCCESS);
+                    this._results.reload();
                 });
             } else if (status === Constants.RunStatus.NO_HOSTS) {
                 this._progress.errorText = 'There are no hosts to check.';
                 this._progress.setStatus(Constants.ProgressStatus.ERROR);
-                this._progress.update();
             } else {
                 Title.change('Running...');
 
                 this._progress.setStatus(Constants.ProgressStatus.RUNNING);
-                this._progress.update();
+                if (!this._progress.visible) {
+                    this._progress.show();
+                }
 
                 //Do request
                 var request = new XMLHttpRequest();
@@ -119,12 +105,11 @@ class Application {
                             this._progressService.currentHostIndex += 1.0;
                         }
                     }
+
+                    this._progress.show();
                 };
                 request.open("get", "runaway.script", true);
                 request.send();
-                //Helpers.delay(function () {
-                //    request.send();
-                //}, 200);
             }
         });
     }
@@ -137,9 +122,8 @@ class Application {
             Helpers.delay(500).then(() => {
                 this._progress.layout();
                 this._results.update().then(() => {
-                    this._progressService.isRunawayCheckRunning = false;
-                    this._progress.update();
                     this._progress.layout();
+                    this._progress.hide();
                 });
             });
         });

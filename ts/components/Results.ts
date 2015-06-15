@@ -40,10 +40,13 @@ class Results extends Component {
         this._isDirty = value;
         if (value) {
             this.e.addClass('dirty');
-            this._noResults.hide(true, $.fx.speeds.fast);
+            if (this._noResults.visible) {
+                this._noResults.hide(true, $.fx.speeds.fast);
+            }
         } else {
             this.e.removeClass('dirty');
-            if (this._progressService.hostCount === 0) {
+            if (this._progressService.hostCount === 0 &&
+                !this._progressService.isRunawayCheckRunning && !this._noResults.visible) {
                 this._noResults.show(true, $.fx.speeds.fast);
             }
         }

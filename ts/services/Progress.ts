@@ -93,6 +93,7 @@ class Progress {
                 this.getProgress().then((progress) => {
                     if (progress === 1.0) {
                         trackProgress.clear();
+                        this.isRunawayCheckRunning = false;
                         promise(true, []);
                     }
                 }, function () {
@@ -111,7 +112,7 @@ class Progress {
         return promise;
     }
 
-    private getProgress(): PinkySwear.GenericPromise<number> {
+    public getProgress(): PinkySwear.GenericPromise<number> {
         var promise = pinkySwear<number>();
 
         $.ajax({
@@ -119,14 +120,20 @@ class Progress {
             success: (response) => {
                 response = response.split('\n')[0].split(' ');
                 if (response[1] === "done") {
-                    this.hostCount = parseInt(response[0]);
-                    this.currentHostIndex = this.hostCount;
+                    if (!this._running) {
+                        this.hostCount = parseInt(response[0]);
+                        this.currentHostIndex = this._hostCount;
 
-                    promise(true, [1.0]);
+                        promise(true, [1.0]);
+                    } else {
+                        this.reset();
+
+                        promise(true, [0.0]);
+                    }
                 } else {
                     this.currentHostName = response[1];
                     response = response[0].split('/');
-                    this._hostCount = parseInt(response[1]);
+                    this.hostCount = parseInt(response[1]);
                     this.currentHostIndex = parseInt(response[0]);
 
                     promise(true, [this.progress]);

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SpyJsConfiguration">
+    <event-filters>
+      <event-filter name="No progress">
+        <event-filter-conditions>
+          <event-filter-condition value="progress" />
+          <event-filter-condition value="webkitTransitionEnd" />
+        </event-filter-conditions>
+      </event-filter>
+    </event-filters>
+  </component>
+</project>

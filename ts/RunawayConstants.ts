@@ -7,6 +7,7 @@ module Constants {
     }
 
     export enum ProgressStatus {
+        NOT_RUNNING,
         RUNNING,
         SUCCESS,
         ERROR

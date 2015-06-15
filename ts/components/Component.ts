@@ -11,6 +11,10 @@ class Component {
         this._element = <ZeptoFxCollection>$(element);
     }
 
+    public get visible(): boolean {
+        return this.e.css('display') !== 'none';
+    }
+
     public show(fade: boolean = false, duration: number = $.fx.speeds._default) {
         if (fade) {
             this.e.fadeIn(duration);
