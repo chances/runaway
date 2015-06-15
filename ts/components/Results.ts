@@ -1,16 +1,20 @@
 import Helpers = require('../Helpers');
 
+import ProgressService = require('../services/Progress');
 import Component = require('./Component');
 
 class Results extends Component {
+    private _progressService: ProgressService;
     private _noResults: Component;
     private _runTime: Component;
 
     private _runDate: string;
     private _isDirty: boolean;
 
-    constructor () {
+    constructor (progress: ProgressService) {
         super('#results');
+
+        this._progressService = progress;
 
         this._noResults = new Component('#noResults');
         this._runTime = new Component('#runTime');
@@ -39,7 +43,7 @@ class Results extends Component {
             this._noResults.hide(true, $.fx.speeds.fast);
         } else {
             this.e.removeClass('dirty');
-            if (app.progress.hostCount === 0) {
+            if (this._progressService.hostCount === 0) {
                 this._noResults.show(true, $.fx.speeds.fast);
             }
         }
@@ -53,6 +57,7 @@ class Results extends Component {
             this.parse(results);
             this.isDirty = false;
             Helpers.delay(225).then(() => {
+                console.log('delay to show results...');
                 this.show(true);
                 promise(true, []);
             });

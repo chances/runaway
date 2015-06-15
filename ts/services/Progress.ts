@@ -7,14 +7,12 @@ class Progress {
 
     private _running: boolean;
     private _initByUser: boolean;
-    private _progress: number;
     private _hostCount: number;
     private _currentHostIndex: number;
     private _currentHostName: string;
 
     constructor() {
         this.events = new Events.Bridge();
-        this._progress = 0.0;
         this._hostCount = 0;
         this._currentHostIndex = 0;
         this._currentHostName = "";
@@ -37,11 +35,10 @@ class Progress {
     }
 
     public get progress(): number {
-        return this._progress;
-    }
-    public set progress(value: number) {
-        this._progress = value;
-        this.events.trigger("propertyChanged", {property: "progress"});
+        if (this._hostCount < 1) {
+            return 0.0;
+        }
+        return this._currentHostIndex / this._hostCount;
     }
 
     public get hostCount(): number {
@@ -50,6 +47,7 @@ class Progress {
     public set hostCount(value: number) {
         this._hostCount = value;
         this.events.trigger("propertyChanged", {property: "hostCount"});
+        this.events.trigger("propertyChanged", {property: "progress"});
     }
 
     public get currentHostIndex(): number {
@@ -58,6 +56,7 @@ class Progress {
     public set currentHostIndex(value: number) {
         this._currentHostIndex = value;
         this.events.trigger("propertyChanged", {property: "currentHostIndex"});
+        this.events.trigger("propertyChanged", {property: "progress"});
     }
 
     public get currentHostName(): string {
@@ -75,16 +74,15 @@ class Progress {
     public reset() {
         this._running = false;
         this._initByUser = false;
-        this._progress = 0.0;
         this._hostCount = 0;
         this._currentHostIndex = 0;
         this._currentHostName = '';
 
         this.events.trigger("propertyChanged", {property: "isRunawayCheckRunning"});
         this.events.trigger("propertyChanged", {property: "initByUser"});
-        this.events.trigger("propertyChanged", {property: "progress"});
         this.events.trigger("propertyChanged", {property: "hostCount"});
         this.events.trigger("propertyChanged", {property: "currentHostIndex"});
+        this.events.trigger("propertyChanged", {property: "progress"});
         this.events.trigger("propertyChanged", {property: "currentHostName"});
     }
 

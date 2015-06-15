@@ -1,10 +1,4 @@
-import Progress = require('./services/Progress');
+import ProgressService = require('./services/Progress');
 import Application = require('./Application');
 
-var services = {
-    progress: new Progress()
-};
-
-var app = new Application();
-
-services.progress.app = app;
+var app = new Application(new ProgressService());

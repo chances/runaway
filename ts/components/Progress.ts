@@ -1,7 +1,8 @@
-/// <reference path="../Application.ts" />
 import Helpers = require('../Helpers');
 import Constants = require('../RunawayConstants');
 
+import Application = require('../Application');
+import ProgressService = require('../services/Progress');
 import Component = require('./Component');
 import RunButton = require('./RunButton');
 import RunningLabel = require('./RunningLabel');
@@ -17,15 +18,13 @@ class Progress extends Component {
     private _progressBar: Component;
     private _icon: Component;
 
-    private _progress: number;
-    private _hostCount: number;
-    private _currentHostIndex: number;
-    private _currentHostName: string;
+    private _progressService: ProgressService;
 
-    constructor (app: Application) {
+    constructor (app: Application, progressService: ProgressService) {
         super('#progress');
 
         this.app = app;
+        this._progressService = progressService;
 
         this._runButton = new RunButton();
         this._runningLabel = new RunningLabel();
@@ -35,10 +34,28 @@ class Progress extends Component {
         this._progressBar = new Component('#progressBar');
         this._icon = new Component('#icon');
 
-        this._progress = 0.0;
-        this._hostCount = 0;
-        this._currentHostIndex = 0;
-        this._currentHostName = '';
+        this._progressService.addEventListener('propertyChanged', (data) => {
+            switch (data.property) {
+                case 'isRunawayCheckRunning':
+                    break;
+                case 'initByUser':
+                    break;
+                case 'currentHostName':
+                    this._hostName.e.text(this._progressService.currentHostName);
+                    break;
+                case 'hostCount':
+                case 'currentHostIndex':
+                case 'progress':
+                    this._hostCountElem.e.text(this._progressService.hostCount.toString());
+                    this._hostIndex.e.text(this._progressService.currentHostIndex.toString());
+                    if (this._progressService.hostCount > 0) {
+                        this.updateProgress();
+                    }
+                    break;
+                default:
+                    return;
+            }
+        });
 
         this.hide();
 
@@ -49,40 +66,6 @@ class Progress extends Component {
             this.hide(true, $.fx.speeds.fast);
             this.app.results.isDirty = false;
         });
-    }
-
-    public get progress(): number {
-        return this._progress;
-    }
-
-    public get hostCount(): number {
-        return this._hostCount;
-    }
-    public set hostCount(value: number) {
-        this._hostCount = value;
-        this._hostCountElem.e.text(value.toString());
-        if (value > 0) {
-            this.updateProgress(this._currentHostIndex / this._hostCount);
-        }
-    }
-
-    public get currentHostIndex(): number {
-        return this._currentHostIndex;
-    }
-    public set currentHostIndex(value: number) {
-        this._currentHostIndex = value;
-        this._hostIndex.e.text(value.toString());
-        if (this.hostCount > 0) {
-            this.updateProgress(this._currentHostIndex / this._hostCount);
-        }
-    }
-
-    public get currentHostName(): string {
-        return this._currentHostName;
-    }
-    public set currentHostName(value: string) {
-        this._currentHostName = value;
-        this._hostName.e.text(value);
     }
 
     public set errorText(value: string) {
@@ -139,7 +122,7 @@ class Progress extends Component {
                 });
         };
 
-        if (this.app.isRunawayCheckRunning && !this.app.initByUser) {
+        if (this._progressService.isRunawayCheckRunning && !this._progressService.initByUser) {
             trackProgress = Helpers.interval(function () {
                 doUpdateProgress();
             }, 2000);
@@ -147,7 +130,7 @@ class Progress extends Component {
 
             this._runButton.hide();
             this._runningLabel.show();
-        } else if (this.app.isRunawayCheckRunning) {
+        } else if (this._progressService.isRunawayCheckRunning) {
             this._runButton.hide();
             this._runningLabel.show();
             Helpers.delay(250).then(() => {
@@ -165,18 +148,13 @@ class Progress extends Component {
     }
 
     public reset() {
-        this._progress = 0.0;
-        this._hostCount = 0;
-        this._currentHostIndex = 0;
-        this._currentHostName = '';
-        this._runningLabel.progress = this._progress;
-        this._progressBar.e.css('width','0%');
+        this._progressService.reset();
+        this.updateProgress();
     }
 
-    private updateProgress(progress: number) {
-        this._progress = progress;
-        this._runningLabel.progress = progress;
-        this._progressBar.e.css('width','' + (progress * 100).toFixed(0) + '%');
+    private updateProgress() {
+        this._runningLabel.progress = this._progressService.progress;
+        this._progressBar.e.css('width','' + (this._progressService.progress * 100).toFixed(0) + '%');
     }
 
     private getProgress(): PinkySwear.GenericPromise<number> {
@@ -187,17 +165,17 @@ class Progress extends Component {
             success: (response) => {
                 response = response.split('\n')[0].split(' ');
                 if (response[1] === "done") {
-                    this.hostCount = parseInt(response[0]);
-                    this.currentHostIndex = this.hostCount;
+                    this._progressService.hostCount = parseInt(response[0]);
+                    this._progressService.currentHostIndex = this._progressService.hostCount;
 
                     promise(true, [1.0]);
                 } else {
-                    this.currentHostName = response[1];
+                    this._progressService.currentHostName = response[1];
                     response = response[0].split('/');
-                    this._hostCount = parseInt(response[1]);
-                    this.currentHostIndex = parseInt(response[0]);
+                    this._progressService.hostCount = parseInt(response[1]);
+                    this._progressService.currentHostIndex = parseInt(response[0]);
 
-                    promise(true, [this.progress]);
+                    promise(true, [this._progressService.progress]);
                 }
             },
             error: function() {
