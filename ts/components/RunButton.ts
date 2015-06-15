@@ -1,15 +1,20 @@
+import Application = require('../Application');
+
 import Component = require('./Component');
 
 class RunButton extends Component {
+    private _app: Application;
     private _disabled: boolean;
 
-    constructor () {
+    constructor (app: Application) {
         super('#run');
+
+        this._app = app;
 
         this._disabled = false;
 
-        this.e.click(function () {
-            app.run();
+        this.e.click(() => {
+            this._app.run();
         });
     }
 

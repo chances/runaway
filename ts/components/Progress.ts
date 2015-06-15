@@ -26,8 +26,8 @@ class Progress extends Component {
         this.app = app;
         this._progressService = progressService;
 
-        this._runButton = new RunButton();
-        this._runningLabel = new RunningLabel();
+        this._runButton = new RunButton(app);
+        this._runningLabel = new RunningLabel(progressService);
         this._hostCountElem = new Component('#hostCount');
         this._hostIndex = new Component('#curHostIndex');
         this._hostName = new Component('#hostName');
@@ -153,7 +153,6 @@ class Progress extends Component {
     }
 
     private updateProgress() {
-        this._runningLabel.progress = this._progressService.progress;
         this._progressBar.e.css('width','' + (this._progressService.progress * 100).toFixed(0) + '%');
     }
 
