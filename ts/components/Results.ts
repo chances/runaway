@@ -65,6 +65,19 @@ class Results extends Component {
         return promise;
     }
 
+    public reload(): PinkySwear.Promise {
+        var promise = pinkySwear();
+
+        this.hide(true);
+        Helpers.delay(250).then(() => {
+            this.update().then(() => {
+                promise(true, []);
+            });
+        });
+
+        return promise;
+    }
+
     private getResults(): PinkySwear.GenericPromise<string> {
         var promise = pinkySwear<string>();
 
