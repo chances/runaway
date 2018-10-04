@@ -3,13 +3,13 @@ Runaway!
 
 Bring the sexy back to runaway scripts.
 
-##What is it?
+## What is it?
 
 Runaway! is a graphical web-based frontend to check for runaway processes
 in a unix environment. A runaway check may be performed directly from the
 browser; no terminal access required.
 
-##How it Works
+## How it Works
 
 Runaway! operates within an Apache environment. When you click the 'Run'
 button, your browser will send an HTTP GET request to the backend
@@ -20,7 +20,7 @@ remote hosts it also streams a progress indication to the frontend. After
 the backend script completes, the frontend displays the results of the
 runaway check.
 
-##Want to use it yourself?
+## Want to use it yourself?
 
 Warning, there be bugs and hacks within. Use at your own risk. **Be
 forewarned, YMMV.**
@@ -28,7 +28,7 @@ forewarned, YMMV.**
 Familiarize yourself with the source. Some changes may need to be made
 in order to get the script to work in your environment.
 
-###SSH and Remote Hosts
+### SSH and Remote Hosts
 
 Because the backend script SSHes into remote hosts autonomously, one of
 the following contitions **must** be met:
